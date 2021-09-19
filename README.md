@@ -2,7 +2,7 @@
 
 This codebase acts to provide you a fully working, starter baseline for optimizing your robotic fulfillment center.
 
-![image](https://gitlab.com/systems-iot/syse6301-robotics-fulfillment-project/-/blob/master/example-warehouse.png)
+![image](example-warehouse.png)
 
 Your mission is to optimize the cross-docking that needs to occur in the fulfillment center using your autonomous robots that each can carry packages.  You are looking to minimize the `Packages Available` and maximize the `Total Docked`, while keeping the `Total Collision Time` to 0.  You will be judged on the final numbers for each of these parameters over a simulation time of 3500.
 
