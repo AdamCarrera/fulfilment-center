@@ -30,6 +30,27 @@ The main server (REST API) is found in `app.py`.
 The controller (the thing that runs a loop and does your optimmization control) is found in `controller.py`.
 
 
+### Running the files
+To run the server, you should open a terminal, and make sure you activate your virtual environment:
+```
+source venv/bin/activate
+```
+> Make sure you are in the `syse6301-robotics-fulfilment-project` folder!  It's on the desktop.
+
+Once you see a little `(venv)` on your terminal, run the API server:
+
+```
+source start.app.sh
+```
+
+In a different terminal, you can run the `controller.py`.  Once again, make sure you activate your `venv`.  Once your virtual environment is activated, run the controller:
+
+```
+python controller.py
+```
+
+
+
 ## REST API
 The following API calls are made by the Robots and Fulfillment center.  You must make sure you follow the definitions exactly, or else your robots won't work!
 
