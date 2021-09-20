@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Body, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
+import json
 
 app = FastAPI()
 
@@ -19,6 +20,7 @@ app.add_middleware(
 robots = {}
 robot_commands = {}
 location_status = {}
+robot_websocket_connections = {}
 
 
 # Route to update the status of a robot by name - the robots will 
@@ -59,6 +61,7 @@ def update_robot(id, body: dict = Body(...)):
 
     return robot_commands[id]
 
+# Posts a fulfillment location status - this is used by the docks and intake robotics
 @app.post("/fulfillment-locations/{id}/status")
 def update_location_status(id, body: dict = Body(...)):
 
@@ -70,6 +73,7 @@ def update_location_status(id, body: dict = Body(...)):
 
     return location_status[id]
 
+# Route to get the current status of an intake or dock fulfillment location
 @app.get("/fulfillment-locations/{id}")
 def get_location_status(id):
 
@@ -78,3 +82,14 @@ def get_location_status(id):
         location_status[id] = {}
 
     return location_status[id]
+
+# The constant websocket connection that allows for back and forth data flow between the robot and the API
+@app.websocket("/device-data-stream/{id}")
+async def websocket_endpoint(websocket: WebSocket, id: str):
+    await websocket.accept()
+    robot_websocket_connections[id] = websocket
+    while True:
+        data = await websocket.receive_text()
+        robots[id] = json.loads(data)
+        if id in robot_commands:
+            await websocket.send_text(json.dumps(robot_commands[id]))
