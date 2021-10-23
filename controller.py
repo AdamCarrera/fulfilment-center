@@ -2,7 +2,7 @@ import requests
 import json
 from time import sleep
 
-base_url = "192.168.2.27:9080"
+base_url = "localhost:5000"
 
 # helpful variables that hold the coordinates for the intakes and docks
 intake_A = [0, 750]
