@@ -217,3 +217,8 @@ git clone https://gitlab.com/systems-iot/syse6301-robotics-fulfillment-project
 Development environments were set up individually for each group.  Each group gets its own URL where they can VNC into the appropriate Zorin development environment.  To access the environment, visit and download a VNC client such as https://www.realvnc.com/en/connect/download/viewer/
 
 Once you download and install the VNC viewer, enter the url provided to your group to log into your development environment.  It should be set up and ready for you to begin investigating and improving the system.
+
+#### My VNC Server won't connect
+If you get error messages or your VNC server says something about bad credentials or error code 1000, you may need to disable some authentication of the VNC in the connection properties to match these settings:  
+
+![image](vncconfig.png)
