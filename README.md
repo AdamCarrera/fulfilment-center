@@ -206,3 +206,14 @@ Example Response:
     "total": 50
 }
 ```
+## Accessing your development Environment
+If you are comfortable with python (https://gitlab.com/systems-iot/resources-and-tools/blob/master/python.md) and development toolchains, you are more than welcome to clone the project and run it locally: 
+
+```
+git clone https://gitlab.com/systems-iot/syse6301-robotics-fulfillment-project
+```
+ > This is not necessarily recommended unless you are familiar with `git`, `python` and web technologies.  
+
+Development environments were set up individually for each group.  Each group gets its own URL where they can VNC into the appropriate Zorin development environment.  To access the environment, visit and download a VNC client such as https://www.realvnc.com/en/connect/download/viewer/
+
+Once you download and install the VNC viewer, enter the url provided to your group to log into your development environment.  It should be set up and ready for you to begin investigating and improving the system.
