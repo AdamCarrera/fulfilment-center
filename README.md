@@ -1,47 +1,62 @@
-# Autonomous Fulfillment Robot Starter
+# MECH 6318 Group 8 Final Project Code
 
-This codebase acts to provide you a fully working, starter baseline for optimizing your robotic fulfillment center.
+This repository contains the code used for implementing and testing our optimization algorithm. Our simulation was run on a linux virtual machine (Manjaro XFCE) and we believe that the steps outlined here should be similar for any UNIX based operating system. This simulation can be run on a windows machine, however there is one dependency (Gunicorn) that does not work on windows. 
 
-![image](example-warehouse.png)
+There was a noticeable decrease in the code speed during runtime on the windows machine, however the underlying algorithm remains the same. 
 
-Your mission is to optimize the cross-docking that needs to occur in the fulfillment center using your autonomous robots that each can carry packages.  You are looking to minimize the `Packages Available` and maximize the `Total Docked`, while keeping the `Total Collision Time` to 0.  You will be judged on the final numbers for each of these parameters over a simulation time of 3500.
+## Warehouse Simulation
 
-You have 5 autonomous robots at your disposal to service 3 intake locations and 3 docks.  The goal is to take as many packages as possible from the intake locations and move them to the docking locations.  Here are some facts:
+This project makes use part of the SYSE 6301 semester project, which involves the simulation of an unmanned fulfillment center. The code and outline for the SYSE repository can be found here: https://gitlab.com/systems-iot/syse6301-robotics-fulfillment-project/-/tree/master
 
-1. Packages are continually added to all the intake locations on a regular basis.  The adding of packages is deterministic.  The model is not specified, but you can likely collect some data to figure it out (if it helps you).
-2. The provided `controller.py` code performs a sub-optimal strategy.  You could choose to use this one, but you will lose, and not get a good grade.  With that said, there is no right answer - just do the best you can.
-3. Packages are automatically assigned to be delivered to specific docks.  When a robot enters an intake location, and has available capacity, the packages are automatically loaded onto the robot by another robotic process.  There may be some delay in the loading process, but it is generally (statistically) quantifiable.
-4. When a robot enters a dock location and there are packages slated to be delivered to that dock location, they are automatically unloaded from the robot.  Again, this is a relatively quick process.
-5. Collisions between robots can occur, and is quantified by the amount of time the robots are overlapping.  This is a double count, as both robots will be counting their collision time.  This should be avoided at all costs.
-6. Robots report in on a regular basis, as well as when they reach their destination.  They will also report their status if they are colliding.  There is a rate limit to how often they report.  This is generally around 1500ms, but will vary based on performance of the network they are on, and how complex the calculations are that are being made.
-7. Locations report their status on a frequent basis (every 2-5s).  
-8. Robot speeds max out at 25 speed units.  You can try to specify above that, but the max speed will top out at 25.
-9.  You can specify any `(x,y)` coordinate pair you want as a destination.  It is recommended to keep it in the warehouse layout.  Why would you specify outside of it anyways?
-10. The UI can be a bit buggy - there are a lot of 3D calculations going on, and I didn't spend the time to optimize the code.  I recommend making sure to keep the browser window open and in the forefront when running a simulation.  If you don't keep it forefront, the browser optimizer processes will selectively compute certain calculations but not others, and you will get nonsensical numbers.
-11.  Everything is structured as a timed loop, and every team functions on the same compute platform.  Therefore, you should all be on even playing ground (even if your simulations tend to seem slower or faster from run to run), the final numbers should be consistent.  Turning the `debug` off will certainly speed stuff up!
-12. You may see non-physical jitters with your robots - it's just the graphics, and they are not optimized.
-14. Restarting your REST API server and your controller will restart it from scratch with no memory.  Keep this in mind when you are designing your optimization.  Feel free to provide a persistence layer (`sqlite` is a good one), but it is not necessary to do a great job.
-15. The robots autonomous paths are based on unit vector calculations based on the cartesian coordinate system, and are computed at each tick of the clock.  Therefore, the paths are not optimal.  You may find it a good idea to control the paths a bit more carefully...but keep in mind, the mmore communications you force, the worse the network performance gets!
+## Accessing the simulation
+
+The simulation is a web application. It can be accessed here: https://robotic-fulfillment-syse6301.netlify.app/
+
+The browser used for our simulations is firefox. It is recommended to keep the simulation window open, as anomalies can occur when the simulation window is minimized.
 
 
-## Files available to you
-The main server (REST API) is found in `app.py`.  
+## Running the Simulation
 
-The controller (the thing that runs a loop and does your optimmization control) is found in `controller.py`.
+In addition to the web application, you will also need two terminals, one to run the server, and one to run the controller.
 
+### Installing the virtual environment
 
-### Running the files
-To run the server, you should open a terminal, and make sure you activate your virtual environment:
+In a terminal, navigate to the project directory and  run the following command to create the virtual environment.
+
+```
+python -m venv venv
+```
+
+Then, activate the environment with the following,
+
 ```
 source venv/bin/activate
 ```
-> Make sure you are in the `syse6301-robotics-fulfilment-project` folder!  It's on the desktop.
 
-Once you see a little `(venv)` on your terminal, run the API server:
+> Windows users use ```.\venv\Scripts\activate.bat```
+
+Once you see a little `(venv)` on your terminal,the environment is active
+
+### Installing dependencies
+
+In the project directory and with the environment active, run the following command
+
+```
+pip install -r requirements.txt
+```
+
+### Running the server
+To run the server, you should open a terminal, and make sure you activate your virtual environment. 
 
 ```
 source start.app.sh
 ```
+
+> Windows users: run ```python -m uvicorn --reload --port 5000 app:app```
+
+Wait until the server shows that a connection is successful. You will also know you are connected when the red X's disappear from the robots. Once you are connected you can run the controller.
+
+### Running the controller
 
 In a different terminal, you can run the `controller.py`.  Once again, make sure you activate your `venv`.  Once your virtual environment is activated, run the controller:
 
@@ -49,176 +64,6 @@ In a different terminal, you can run the `controller.py`.  Once again, make sure
 python controller.py
 ```
 
+## Known bug
 
-
-## REST API
-The following API calls are made by the Robots and Fulfillment center.  You must make sure you follow the definitions exactly, or else your robots won't work!
-
-#### Report Robot Status
-> `POST /devices/<id>/status`
-
-Example Respone:
-```
-{
-	"name": "sue",
-	"x": 1000,
-	"y": 500,
-	"speed": 0,
-	"destination": [1000, 500],
-	"hasPayload": true,
-	"payloadCount": 16,
-	"maxPayloadCount": 50,
-	"connected": false,
-	"lastReport": 42000,
-	"payloadSplit": {
-		"dock-A": 11,
-		"dock-B": 0,
-		"dock-C": 5
-	},
-	"clock": 4260
-}
-```
-
-
-#### GET Robot Status
-> `GET /devices/<id>`
-
-Response:
-```
-{
-    "clock": 1110,
-    "connected": true,
-    "destination": [
-        1000,
-        250
-    ],
-    "fromStop": true,
-    "hasPayload": true,
-    "lastReport": 10500,
-    "maxPayloadCount": 50,
-    "name": "dude",
-    "payloadCount": 25,
-    "payloadSplit": {
-        "dock-A": 0,
-        "dock-B": 19,
-        "dock-C": 6
-    },
-    "speed": 0,
-    "x": 1000,
-    "y": 250
-}
-```
-
-#### GET Robot Commands
-> `GET devices/<id>/commands`
-Gets the latest command set send to the robot.  The robot uses this to retrieve its latest commands (speed and destination coordinates):
-
-Response:
-```
-{
-    "destination": [
-        0,
-        750
-    ],
-    "id": "dude",
-    "speed": 20
-}
-```
-
-
-#### POST Robot Commands
-> `POST /devices/<id>/params`
-Helper route that allows an opimization process to post a command for a robot to read with the `GET /devices/<id>/commands` route.
-
-Example Request:
-```
-{
-    "destination": [0,750],
-    "speed":20
-}
-```
-
-Example Response:
-```
-{
-    "destination": [
-        0,
-        750
-    ],
-    "id": "dude",
-    "speed": 20
-}
-```
-
-#### POST Fulfillment Location Status
-> `POST /fulfillment-locations/<id>/status`
-The route that the fulfillment (intake and dock) locations will hit to provide their specific updates.
-
-Example Request:
-```
-{
-	"name": "sue",
-	"x": 25,
-	"y": 500,
-	"speed": 25,
-	"destination": [0, 500],
-	"hasPayload": true,
-	"payloadCount": 50,
-	"maxPayloadCount": 50,
-	"connected": true,
-	"lastReport": 34500,
-	"reportFrequency": 500,
-	"setSpeed": 25,
-	"payloadSplit": {
-		"dock-A": 50,
-		"dock-B": 0,
-		"dock-C": 0
-	},
-	"clock": 3840
-}
-```
-
-Expected Example Response:
-```
-{
-	'available': 0,
-	'total': 0,
-	'lastReport': 0,
-	'isDock': true
-}
-```
-
-#### GET Fulfillment Location Status
-> `GET /fulfillment-locations/<id>`
-Gets the status of the fulfillment location
-
-Example Response:
-```
-{
-    "available": 492,
-    "isDock": false,
-    "lastReport": 0,
-    "payloadSplit": {
-        "dock-A": 145,
-        "dock-B": 155,
-        "dock-C": 192
-    },
-    "total": 50
-}
-```
-## Accessing your development Environment
-If you are comfortable with python (https://gitlab.com/systems-iot/resources-and-tools/blob/master/python.md) and development toolchains, you are more than welcome to clone the project and run it locally: 
-
-```
-git clone https://gitlab.com/systems-iot/syse6301-robotics-fulfillment-project
-```
- > This is not necessarily recommended unless you are familiar with `git`, `python` and web technologies.  
-
-Development environments were set up individually for each group.  Each group gets its own URL where they can VNC into the appropriate Zorin development environment.  To access the environment, visit and download a VNC client such as https://www.realvnc.com/en/connect/download/viewer/
-
-Once you download and install the VNC viewer, enter the url provided to your group to log into your development environment.  It should be set up and ready for you to begin investigating and improving the system.
-
-#### My VNC Server won't connect
-If you get error messages or your VNC server says something about bad credentials or error code 1000, you may need to disable some authentication of the VNC in the connection properties to match these settings:  
-
-![image](vncconfig.png)
+Occasionally, the robot will fail to pick up any packages upon visiting an intake despite having sufficient storage space. We assume that this is an issue with the web application, and it can be solved by restarting the simulation by clicking the reset button in the browser. It may take a couple of tries.
